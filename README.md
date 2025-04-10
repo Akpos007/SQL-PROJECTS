@@ -1,64 +1,56 @@
+# World Life Expectancy Data Analysis
 
-# SQL Portfolio Project: World Life Expectancy Data Cleaning
+## Project Overview
+This project focuses on cleaning and analyzing a world life expectancy dataset using SQL. The analysis examines life expectancy trends across countries, years, and various factors such as GDP, BMI, and development status.
 
-## Overview
-This repository contains SQL scripts for cleaning and preparing a "World Life Expectancy" dataset. The project demonstrates fundamental data cleaning techniques using SQL, including identifying and removing duplicates, handling missing data, and ensuring data consistency. The goal is to transform raw data into a reliable dataset suitable for further analysis.
-
-## Project Description
-The dataset used in this project includes life expectancy data across various countries and years. The SQL scripts focus on:
-- Identifying and removing duplicate records.
-- Handling missing values in key columns such as `Status` and `Life Expectancy`.
-- Ensuring data integrity through updates based on logical assumptions and relationships.
-
-This project showcases my ability to write efficient SQL queries for data cleaning and preparation, a critical step in any data analysis pipeline.
-
-## Features
-1. **Duplicate Removal**:
-   - Identifies duplicate entries based on a combination of `Country` and `Year`.
-   - Deletes duplicate rows while retaining the first occurrence.
-
-2. **Handling Missing Data**:
-   - Fills missing `Status` values (`Developed` or `Developing`) by referencing other records for the same country.
-   - Imputes missing `Life Expectancy` values by averaging the life expectancy of the previous and next years for the same country.
-
-3. **Data Validation**:
-   - Uses subqueries and window functions to detect anomalies.
-   - Applies updates systematically to maintain consistency.
+## Objectives
+1. Clean the dataset by handling duplicates and missing values
+2. Perform exploratory data analysis to uncover trends and relationships
+3. Examine factors influencing life expectancy across different countries
 
 ## Dataset
-The dataset (`world_life_expectancy`) includes the following key columns:
-- `Row_ID`: Unique identifier for each row.
-- `Country`: Name of the country.
-- `Year`: Year of the record.
-- `Status`: Development status of the country (`Developed` or `Developing`).
-- `Life Expectancy`: Life expectancy value for the country in a given year.
+The analysis uses data from the `world_life_expectancy` table containing:
+- Country
+- Year
+- Life Expectancy
+- Status (Developed/Developing)
+- GDP
+- BMI
+- Adult Mortality
+- Row_ID (unique identifier)
 
-## SQL Scripts
-The main SQL operations are outlined below:
+## Project Structure
+The SQL script is organized into two main sections:
 
 ### 1. Data Cleaning
-- **Preview Data**: Basic `SELECT` query to explore the dataset.
-- **Duplicate Detection**: Uses `CONCAT(Country, Year)` to identify duplicates and assigns row numbers to flag them.
-- **Duplicate Removal**: Deletes duplicate rows based on `Row_ID`.
+- Identifies and removes duplicate records based on Country and Year combinations
+- Handles missing values in:
+  - Status: Fills based on other records for the same country
+  - Life Expectancy: Interpolates using average of previous and next year's values
 
-### 2. Handling Missing Data
-- **Missing Status**:
-  - Identifies countries with empty `Status`.
-  - Updates missing `Status` values by joining with records of the same country that have valid `Status` values.
-- **Missing Life Expectancy**:
-  - Identifies records with empty `Life Expectancy`.
-  - Calculates the average of the previous and next year’s life expectancy for the same country and updates the missing value.
+### 2. Exploratory Data Analysis (EDA)
+- Analyzes life expectancy ranges by country
+- Calculates life expectancy increases over time
+- Examines yearly global life expectancy trends
+- Investigates relationships between:
+  - Life expectancy and GDP
+  - Life expectancy and development status
+  - Life expectancy and BMI
+- Computes rolling totals of adult mortality for specific countries
+
+## Prerequisites
+- SQL database system (e.g., MySQL, PostgreSQL)
+- World life expectancy dataset loaded into a table named `world_life_expectancy`
 
 ## Usage
-1. **Requirements**:
-   - A SQL database management system (e.g., MySQL, PostgreSQL, SQL Server).
-   - The `world_life_expectancy` table loaded into your database.
+1. Ensure the dataset is loaded into your SQL database
+2. Execute the SQL script in your preferred SQL environment
+3. Review the query results for insights
 
-2. **How to Run**:
-   - Import the dataset into your SQL environment.
-   - Execute the SQL scripts in the following order:
-     1. Preview the data.
-     2. Remove duplicates.
-     3. Handle missing `Status` values.
-     4. Handle missing `Life Expectancy` values.
-   - Verify the results after each step using `SELECT` queries.
+## Key Findings
+- Life expectancy trends over time by country
+- Correlation between GDP and life expectancy
+- Differences in life expectancy between developed and developing countries
+- Relationship between BMI and life expectancy
+- Adult mortality patterns for specific countries
+
