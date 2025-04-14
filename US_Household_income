@@ -1,0 +1,152 @@
+# Select all records from the statistics table
+SELECT * 
+FROM us_household_income_statistics;
+
+# Select all records from the main table
+SELECT * 
+FROM us_household_income;
+
+# Rename column 'id to id (removing backticks)
+ALTER TABLE us_household_income_statistics 
+RENAME COLUMN `'id` TO `id`;
+
+# Count total records in main table
+SELECT COUNT(id) 
+FROM us_household_income;
+
+# Count total records in statistics table
+SELECT COUNT(id) 
+FROM us_household_income_statistics;
+
+#----------DATA CLEANING---------
+
+# Check for duplicate IDs in main table
+SELECT id, COUNT(id)
+FROM us_household_income
+GROUP BY id
+HAVING COUNT(id) > 1;
+
+# Delete duplicate records from main table, keeping only the first occurrence
+DELETE FROM us_household_income
+WHERE row_id IN (
+    SELECT row_id
+    FROM (
+        SELECT row_id,
+               id,
+               ROW_NUMBER() OVER(PARTITION BY id ORDER BY id) row_num
+        FROM us_household_income
+    ) duplicates
+    WHERE row_num > 1
+);
+
+# Check for duplicate IDs in statistics table
+SELECT id, COUNT(id)
+FROM us_household_income_statistics
+GROUP BY id
+HAVING COUNT(id) > 1;
+
+# List unique state names in alphabetical order
+SELECT DISTINCT(state_name)
+FROM us_household_income
+ORDER BY 1;
+
+# Correct misspelled state name 'georia' to 'Georgia'
+UPDATE us_household_income
+SET state_name = 'Georgia'
+WHERE state_name = 'georia';
+
+# Correct misspelled state name 'alabama' to 'Alabama'
+UPDATE us_household_income
+SET state_name = 'Alabama'
+WHERE state_name = 'alabama';
+
+# Find records with empty place names
+SELECT *
+FROM us_household_income
+WHERE place = ''
+ORDER BY 1;
+
+# Find records for Autauga County
+SELECT *
+FROM us_household_income
+WHERE county = 'Autauga County'
+ORDER BY 1;
+
+# Update place name for specific record in Autauga County
+UPDATE us_household_income
+SET Place = 'Autaugaville'
+WHERE County = 'Autauga County'
+AND City = 'Vinemont';
+
+# Count occurrences of each Type
+SELECT Type, COUNT(Type)
+FROM us_household_income
+GROUP BY Type;
+
+# Correct 'Boroughs' to 'Borough'
+UPDATE us_household_income
+SET Type = 'Borough'
+WHERE Type = 'Boroughs';
+
+#------------EXPLORATORY DATA ANALYSIS(EDA)-------------
+
+# View all statistics data
+SELECT * 
+FROM us_household_income_statistics;
+
+# View all main table data
+SELECT * 
+FROM us_household_income;
+
+# Calculate total land and water area by state, top 10 by land area
+SELECT State_Name, SUM(Aland), SUM(Awater)
+FROM us_household_income
+GROUP BY State_Name
+ORDER BY 2 DESC
+LIMIT 10;
+
+# Join tables to show income statistics by state and county
+SELECT u.State_Name, County, Type, `Primary`, Mean, Median
+FROM us_household_income u
+INNER JOIN us_household_income_statistics us
+    ON u.id = us.id
+WHERE mean <> 0;
+
+# Calculate average mean and median income by state, top 10 by median
+SELECT u.State_Name, ROUND(AVG(Mean),1), ROUND(AVG(Median),1)
+FROM us_household_income u
+INNER JOIN us_household_income_statistics us
+    ON u.id = us.id
+WHERE mean <> 0
+GROUP BY u.State_Name
+ORDER BY 3 DESC
+LIMIT 10;
+
+# Calculate income statistics by type, top 20 by median
+SELECT Type, COUNT(Type), ROUND(AVG(Mean),1), ROUND(AVG(Median),1)
+FROM us_household_income u
+INNER JOIN us_household_income_statistics us
+    ON u.id = us.id
+WHERE mean <> 0
+GROUP BY Type
+ORDER BY 4 DESC
+LIMIT 20;
+
+# Calculate income statistics by type for types with >100 occurrences
+SELECT Type, COUNT(Type), ROUND(AVG(Mean),1), ROUND(AVG(Median),1)
+FROM us_household_income u
+INNER JOIN us_household_income_statistics us
+    ON u.id = us.id
+WHERE mean <> 0
+GROUP BY Type
+HAVING COUNT(Type) > 100
+ORDER BY 4 DESC
+LIMIT 20;
+
+# Calculate average income by state and city, ordered by mean income
+SELECT u.state_name, City, ROUND(AVG(Mean),1), ROUND(AVG(Median),1)
+FROM us_household_income u
+JOIN us_household_income_statistics us
+    ON u.id = us.id
+GROUP BY u.state_name, City
+ORDER BY ROUND(AVG(Mean),1) DESC;
